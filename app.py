@@ -14,13 +14,13 @@ app.config['MYSQL_DATABASE_DB'] = 'be'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
 print('------------------------------------------------------------')
-conn = mysql.connect()
+""" conn = mysql.connect()
 cursor = conn.cursor()
 data = cursor.execute('SELECT * FROM urls ')
 data = cursor.fetchall()
 print(data)
 conn.commit()
-conn.close()
+conn.close() """
 
 
 @app.route('/', methods=('GET', 'POST'))
@@ -82,8 +82,6 @@ def stats():
     conn.close()
     print('+++++++++++++++++++++++++++++++++++++++++++++',db_urls)
     urls = list(db_urls)
-
-
     """ for url in db_urls:
         url = dict(url)
         url['short_url'] = request.host_url + hashids.encode(url['id'])
