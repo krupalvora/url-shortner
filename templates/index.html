@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %} Link Shortner {% endblock %}
+{% block content %}
+   
+    <form method="post">
+    <div class="form-group">
+        <label for="url">URL</label>
+        <input type="text" name="url"
+               placeholder="URL to shorten" class="form-control"
+               value="{{ request.form['url'] }}" autofocus>
+    </div>
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+    </form>
+
+    {% if short_url %}
+    <hr>
+    
+
+    <a href="{{ short_url }}">{{ short_url }}</a>
+    {% endif %}
+{% endblock %}
