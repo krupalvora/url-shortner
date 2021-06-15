@@ -6,10 +6,11 @@
         <thead>
             <tr>
             <th scope="col">#</th>
-            <th scope="col">Short</th>
+            <th scope="col">Date</th>
             <th scope="col">Original</th>
             <th scope="col">Clicks</th>
             <th scope="col">Creation Date</th>
+            <th scope="col">action</th>
             </tr>
         </thead>
         <tbody>
@@ -20,6 +21,9 @@
                     <td>{{ url[2] }}</td>
                     <td>{{ url[3] }}</td>
                     <td>{{ url[4] }}</td>
+                    <td> <form action="{{url_for('delete',id=url[0])}}" method="post">
+                        <input type="hidden" name="_method"  value = "DELETE">
+                        <input type="submit" class="btn btn-danger" value="Delete"></form></td>
                 </tr>
             {% endfor %}
         </tbody>
