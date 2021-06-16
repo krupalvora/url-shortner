@@ -25,45 +25,35 @@ def index():
         custom=data['custom']
         data = cursor.execute('SELECT extend FROM urls WHERE extend = (%s)', (custom,))
         data = cursor.fetchone()
-        print('..............................................',data)
-        if data is None:
-            print('-----------------------------------')
-            url_id=1
-            if custom=='':
-                hashid = hashids.encode(url_id)
-                short_url = request.host_url + hashid
-            else:
-                short_url = request.host_url + custom
-                hashid=custom
-            print('****************')
-            print(url_id,url, short_url, hashid)
-            url_data = cursor.execute('INSERT INTO urls (id,original_url,new_url,extend) VALUES (%s,%s,%s,%s)', (url_id,url, short_url, hashid))
-            conn.commit()
-            conn.close()
-            return render_template('index.html', short_url=short_url)
-                  
-        else:
-            print('++++++++++++++++++++++++++++++++++++ ')
-            url_id = cursor.execute('select id from urls ORDER BY id desc')
-            url_id =cursor.fetchall()   
-            url_id=url_id[0]
-            url_id=url_id[0]
+        print('*******************************************',data)
+        try:
             if data[0]!='':
                 flash('set other custom url !')
                 return redirect(url_for('index'))
-            if custom=='':
-                hashid = hashids.encode(url_id)
-                short_url = request.host_url + hashid
-            else:
-                short_url = request.host_url + custom
-                hashid=custom
-            url_data = cursor.execute('INSERT INTO urls (original_url,new_url,extend) VALUES (%s,%s,%s)', (url, short_url, hashid))
-            conn.commit()
-            conn.close()
-            return render_template('index.html', short_url=short_url)
+        except:
+            pass
+        if not url:
+            flash('The URL is required!')
+            return redirect(url_for('index'))
+
+        url_id = cursor.execute('select id from urls ORDER BY id desc')
+        url_id =cursor.fetchall()
+        url_id=url_id[0]
+        url_id=url_id[0]
+        if custom=='':
+            hashid = hashids.encode(url_id)
+            short_url = request.host_url + hashid
+        else:
+            short_url = request.host_url + custom
+            hashid=custom
+        url_data = cursor.execute(
+            'INSERT INTO urls (original_url,new_url,extend) VALUES (%s,%s,%s)', (url, short_url, hashid))
+        
+        conn.commit()
+        conn.close()
+        return render_template('index.html', short_url=short_url)
 
     return render_template('index.html')
-
 
 @app.route('/<id>')
 def url_redirect(id):
@@ -97,6 +87,7 @@ def stats():
     db_urls=cursor.fetchall()
     conn.close()
     urls = list(db_urls)
+    urls=urls[1:]
     return render_template('stats.html', urls=urls)
 @app.route('/about')
 def about():
