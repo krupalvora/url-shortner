@@ -4,7 +4,7 @@ from flaskext.mysql import MySQL
 from hashids import Hashids
 app = Flask(__name__)
 
-app.config['SECRET_KEY'] = 'dada bhagwan'
+app.config['SECRET_KEY'] = 'krupal vora'
 hashids = Hashids(min_length=4, salt=app.config['SECRET_KEY'])
 
 mysql = MySQL()
