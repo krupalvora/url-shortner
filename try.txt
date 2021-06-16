@@ -250,3 +250,60 @@ def delete(id):
     return redirect(url_for('stats'))
 if __name__ == '__main__':
     app.run(debug=True)
+ <!--    var chart = new CanvasJS.Chart("chartContainer",
+    {
+      title:{
+        text: "Simple Date-Time Chart"
+    },
+    axisX:{
+        title: "timeline",
+        gridThickness: 2
+    },
+    axisY: {
+        title: "Downloads"
+    },
+    data: [
+    {        
+        type: "area",
+        dataPoints: arrayOfArrays
+        
+    }
+    ]
+});
+
+    chart.render();
+} -->
+var arrayOfArrays = {{data | tojson}};
+        console.log(arrayOfArrays)
+        document.getElementById("result").innerHTML = arrayOfArrays;
+        var array=[]
+        var array2=[]
+        var i;
+        var text='';
+        for(i=0;i<arrayOfArrays.length;i++){
+            text += arrayOfArrays[i][0] + "<br>";
+            array.push(arrayOfArrays[i][0])
+            array2.push(arrayOfArrays[i][1])
+        }
+        document.getElementById("demo").innerHTML = text;
+        document.getElementById("demo2").innerHTML = array2;
+        var dps=[]
+        for (var i = 0; i <= array2.length; i++){
+                  dps.push({x:array[i],  y: array[i]});     
+             }
+
+
+             window.onload = function () {
+             var chart = new CanvasJS.Chart("chartContainer", {
+                 title:{
+                     text: "My First Chart in CanvasJS"              
+                 },
+                 data: [              
+                 {
+                     type: "column",
+                     dataPoints: dps
+                 }
+                 ]
+             });
+             chart.render();
+         }

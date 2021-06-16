@@ -2,6 +2,9 @@ from flask import Flask
 from flask import Flask, render_template, request, flash, redirect, url_for
 from flaskext.mysql import MySQL
 from hashids import Hashids
+import json
+import bson
+
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = 'krupal vora'
@@ -101,10 +104,12 @@ def edit(id):
     data=cursor.fetchone()
     id,original_url,click,new_url,extend=data[0],data[2],data[3],data[4],data[5]
     print(data[0],data[2],data[3],data[4],data[5])
-
-    #select id,date,new_url,count(date) noof from views where id= 9 group by date order by date
+    data=cursor.execute('select date,count(date) noof from views where id= (%s) group by date order by date',(id,))
+    data=cursor.fetchall()
+    #data=json.dumps(data, indent=4, sort_keys=True, default=str)#json.loads(data)
+    print('*******************************',data)
     conn.commit()
     conn.close()
-    return render_template('edit.html',id=id,original_url=original_url,new_url=new_url,click=click)
+    return render_template('edit.html',data=data,id=id,original_url=original_url,new_url=new_url,click=click)
 if __name__ == '__main__':
     app.run(host='localhost',port=8000  ,debug=True)

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
-{% block title %} edit {% endblock %}
+{% block title %} Edit {% endblock %}
 {% block content %}
-   <h1>Edit page of {{new_url}}</h1>
+   <h1>Details  of {{new_url}}</h1>
 
 <p>Original link : {{original_url}}</p>
 
@@ -10,43 +10,53 @@
    <form action="/delete/{{id}}" method="post">
     <input type="hidden" name="_method"  value = "DELETE">
     <input type="submit" class="btn btn-danger" value="Delete"></form>
+    
 
-<!-- Graphs -->
-<script type="text/javascript">
-window.onload = function () {
-    var chart = new CanvasJS.Chart("chartContainer",
-    {
-      title:{
-        text: "Simple Date-Time Chart"
-    },
-    axisX:{
-        title: "timeline",
-        gridThickness: 2
-    },
-    axisY: {
-        title: "Downloads"
-    },
-    data: [
-    {        
-        type: "area",
-        dataPoints: [//array
-        { x: new Date(2012, 01, 1), y: 26},
-        { x: new Date(2012, 01, 3), y: 38},
-        { x: new Date(2012, 01, 5), y: 43},
-        { x: new Date(2012, 01, 7), y: 29}
+    <!-- Graphs -->
 
-        ]
-    }
-    ]
-});
-
-    chart.render();
-}
-</script>
-<script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+         <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+         <script type="text/javascript">
+            var arrayOfArrays = {{data | tojson}};
+            var array=[];
+            var array2=[];
+            var i;
+            var text='';
+            for(i=0;i<arrayOfArrays.length;i++){
+                text += arrayOfArrays[i][0] + "<br>";
+                array.push(arrayOfArrays[i][0])
+                array2.push(arrayOfArrays[i][1])
+            }
+            var dps=[]
+            for (var i = 0; i <= array2.length; i++){
+                      dps.push({x:new Date(array[i]),  y: array2[i]});     
+                 }
+            window.onload = function () {
+                var chart = new CanvasJS.Chart("chartContainer",
+                {
+                  title:{
+                    text: "Simple Date-Time Chart"
+                },
+                axisX:{
+                    title: "timeline",
+                    gridThickness: 2
+                },
+                axisY: {
+                    title: "Downloads"
+                },
+                data: [
+                {        
+                    type: "area",
+                    dataPoints:dps
+                }
+                ]
+            });
+            
+                chart.render();
+            }
+         </script>
+         <script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
 
 
 <div id="chartContainer" style="height: 300px; width: 100%;">
 </div>
-
 {% endblock %}
