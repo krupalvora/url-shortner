@@ -14,7 +14,6 @@ app.config['MYSQL_DATABASE_DB'] = 'be'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
 print('------------------------------------------------------------')
-
 @app.route('/', methods=('GET', 'POST'))
 def index():
     conn = mysql.connect()
@@ -25,7 +24,6 @@ def index():
         custom=data['custom']
         data = cursor.execute('SELECT extend FROM urls WHERE extend = (%s)', (custom,))
         data = cursor.fetchone()
-        print('*******************************************',data)
         try:
             if data[0]!='':
                 flash('set other custom url !')
@@ -35,7 +33,6 @@ def index():
         if not url:
             flash('The URL is required!')
             return redirect(url_for('index'))
-
         url_id = cursor.execute('select id from urls ORDER BY id desc')
         url_id =cursor.fetchall()
         url_id=url_id[0]
@@ -46,9 +43,7 @@ def index():
         else:
             short_url = request.host_url + custom
             hashid=custom
-        url_data = cursor.execute(
-            'INSERT INTO urls (original_url,new_url,extend) VALUES (%s,%s,%s)', (url, short_url, hashid))
-        
+        url_data = cursor.execute('INSERT INTO urls (original_url,new_url,extend) VALUES (%s,%s,%s)', (url, short_url, hashid))
         conn.commit()
         conn.close()
         return render_template('index.html', short_url=short_url)
@@ -63,15 +58,9 @@ def url_redirect(id):
     if original_id:
         data = cursor.execute('SELECT * FROM urls WHERE extend = (%s)', (original_id,))
         data = cursor.fetchone()
-        id=data[0]
-        original_url = data[2]
-        click = data[3]
-        new_url=data[4]
-        extend=data[5]
+        id,original_url,click,new_url,extend=data[0],data[2],data[3],data[4],data[5]
         cursor.execute('UPDATE urls SET click = (%s) WHERE extend = (%s)',(click+1, original_id))
-        cursor.execute(
-            'INSERT INTO views (id,original_url,new_url,extend) VALUES (%s,%s,%s,%s)', (id,original_url,new_url, extend))
-        
+        cursor.execute('INSERT INTO views (id,original_url,new_url,extend) VALUES (%s,%s,%s,%s)', (id,original_url,new_url, extend))
         conn.commit()
         conn.close()
         return redirect(original_url)
@@ -102,5 +91,20 @@ def delete(id):
     conn.commit()
     conn.close()
     return redirect(url_for('stats'))
+
+@app.route('/edit/<string:id>',methods = ['POST', 'GET'])
+def edit(id):
+    id=int(id)
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    data=cursor.execute('select * from urls  where id= (%s)', (id,))  
+    data=cursor.fetchone()
+    id,original_url,click,new_url,extend=data[0],data[2],data[3],data[4],data[5]
+    print(data[0],data[2],data[3],data[4],data[5])
+
+    #select id,date,new_url,count(date) noof from views where id= 9 group by date order by date
+    conn.commit()
+    conn.close()
+    return render_template('edit.html',id=id,original_url=original_url,new_url=new_url,click=click)
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='localhost',port=8000  ,debug=True)
