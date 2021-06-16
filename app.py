@@ -8,10 +8,10 @@ app.config['SECRET_KEY'] = 'dada bhagwan'
 hashids = Hashids(min_length=4, salt=app.config['SECRET_KEY'])
 
 mysql = MySQL()
-app.config['MYSQL_DATABASE_USER'] = 'admin'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'kv462000'
-app.config['MYSQL_DATABASE_DB'] = 'be'
-app.config['MYSQL_DATABASE_HOST'] = 'database-1.cirddckxfqzh.us-east-2.rds.amazonaws.com'
+app.config['MYSQL_DATABASE_USER'] = 
+app.config['MYSQL_DATABASE_PASSWORD'] = 
+app.config['MYSQL_DATABASE_DB'] = 
+app.config['MYSQL_DATABASE_HOST'] = 
 mysql.init_app(app)
 print('------------------------------------------------------------')
 
