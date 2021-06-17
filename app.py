@@ -111,5 +111,6 @@ def edit(id):
     conn.commit()
     conn.close()
     return render_template('edit.html',data=data,id=id,original_url=original_url,new_url=new_url,click=click)
+
 if __name__ == '__main__':
     app.run(host='localhost',port=8000  ,debug=True)
