@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %} Login {% endblock %}
+{% block content %}
+
+{% if messages %}
+    <div class="alert alert-danger" role="alert">
+        {{messages[0]}}
+    </div>
+{% endif %}
+
+<form action="/login" method="POST" class="container br-3">
+    <div class="form-floating mb-3">
+        <input type="email" class="form-control" id="email" name="email" placeholder="name@example.com">
+        <label for="floatingInput">Email address</label>
+      </div>
+      <div class="form-floating">
+        <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+        <label for="floatingPassword">Password</label>
+      </div><br>
+    <div class="mb-3 form-check">
+      <input type="checkbox" class="form-check-input" id="exampleCheck1">
+      <label class="form-check-label" for="exampleCheck1">Check me out</label>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>  <br> 
+  <div class="card-footer">
+    <div class="d-flex justify-content-center links">
+        Don't have an account ? &ensp; <a href="/signup">Sign Up</a>
+    </div>
+    <div class="d-flex justify-content-center">
+        <a href="#">Forgot your password?</a>
+    </div>
+</div>
+
+{% endblock %}

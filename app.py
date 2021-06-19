@@ -1,10 +1,10 @@
-from flask import Flask
+from flask import Flask 
 from flask import Flask, render_template, request, flash, redirect, url_for
 from flaskext.mysql import MySQL
 from hashids import Hashids
 import json
 import bson
-
+import pymysql
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = 'krupal vora'
@@ -53,12 +53,13 @@ def index():
 
     return render_template('index.html')
 
-@app.route('/<id>')
+@app.route('/<id>',methods = ['POST', 'GET'])
 def url_redirect(id):
     conn = mysql.connect()
     cursor = conn.cursor()
     original_id=id
-    if original_id:
+    print('**************automate exe***************************',original_id,'hmmmmmmmm')
+    if original_id and original_id!='favicon.ico':
         data = cursor.execute('SELECT * FROM urls WHERE extend = (%s)', (original_id,))
         data = cursor.fetchone()
         id,original_url,click,new_url,extend=data[0],data[2],data[3],data[4],data[5]
@@ -66,7 +67,8 @@ def url_redirect(id):
         cursor.execute('INSERT INTO views (id,original_url,new_url,extend) VALUES (%s,%s,%s,%s)', (id,original_url,new_url, extend))
         conn.commit()
         conn.close()
-        return redirect(original_url)
+        print('--------------if executed--------------------------')
+        return render_template('details.html', url=original_url)#redirect(original_url)
     else:
         flash('Invalid URL')
         return redirect(url_for('index'))
@@ -111,6 +113,54 @@ def edit(id):
     conn.commit()
     conn.close()
     return render_template('edit.html',data=data,id=id,original_url=original_url,new_url=new_url,click=click)
+@app.route('/login', methods=["GET","POST"])
+def login():
+    if request.method == "POST":
+        req = request.form
+        email = request.form["email"]
+        password = request.form["password"]
+        details=[email,password]
+        
+        print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++',details)
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        data=cursor.execute('select * from login where id=(%s) and password=(%s)',(email,password))
+        data=cursor.fetchall()
+        print(data)
+        print(data[0])
+        conn.commit()
+        conn.close()
+        if data[0][0]==email and data[0][1]==password:
+            return render_template('index.html',details=details)
+        else:       
+            print('EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEExcept  ')
+            flash(u'invalid Email or password ')
+            
+    return render_template('login.html')
+@app.route('/signup', methods=["GET","POST"])
+def signup():
+    if request.method == "POST":
+        req = request.form
+        name = request.form["name"]
+        email = request.form["email"]
+        password = request.form["password"]
+        #email="`"+email+"`"
+        print(email,str(email),']]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]')
+        email=str(email)
+        try :
+            conn = mysql.connect()
+            cursor = conn.cursor()
+            cursor.execute('insert into user(id,name,password) values (%s,%s,%s)',(email,name,password)) 
+            cursor.execute('insert into login(id,password) values (%s,%s)',(email,password))
+            cursor.execute(" CREATE TABLE `%s` (id int(11) NOT NULL AUTO_INCREMENT,created date NOT NULL DEFAULT current_timestamp(),original_url text  NOT NULL,click int(11) NOT NULL DEFAULT 0,new_url text DEFAULT NULL,extend text  DEFAULT NULL,PRIMARY KEY (id))",email)
+            conn.commit()
+            conn.close()
+        except pymysql.err.IntegrityError:
+            print('EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEExcept  ')
+            flash(u'Email already in use')
+        
+    return render_template('signup.html')
 
+#pymysql.err.IntegrityError: (1062, "Duplicate entry 'krupal.vora@sakec.ac.in' for key 'PRIMARY'")
 if __name__ == '__main__':
     app.run(host='localhost',port=8000  ,debug=True)
