@@ -1,10 +1,15 @@
-from flask import Flask 
+import os
+from flask import Flask ,jsonify
 from flask import Flask, render_template, request, flash, redirect, url_for
+import flask
 from flaskext.mysql import MySQL
 from hashids import Hashids
 import json
 import bson
 import pymysql
+import sys
+
+
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = 'krupal vora'
@@ -63,16 +68,31 @@ def url_redirect(id):
         data = cursor.execute('SELECT * FROM urls WHERE extend = (%s)', (original_id,))
         data = cursor.fetchone()
         id,original_url,click,new_url,extend=data[0],data[2],data[3],data[4],data[5]
+        print('**aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',id)
         cursor.execute('UPDATE urls SET click = (%s) WHERE extend = (%s)',(click+1, original_id))
-        cursor.execute('INSERT INTO views (id,original_url,new_url,extend) VALUES (%s,%s,%s,%s)', (id,original_url,new_url, extend))
         conn.commit()
         conn.close()
         print('--------------if executed--------------------------')
-        return render_template('details.html', url=original_url)#redirect(original_url)
+        return render_template('details.html', url=original_url,id=id,new_url=new_url,extend=extend)
     else:
         flash('Invalid URL')
         return redirect(url_for('index'))
-
+@app.route('/details',methods = ['POST', 'GET'])
+def details():
+        print('2222222222222222222222222222222222222222222222')
+        data=request.form['data']
+        print(type(data))
+        data=json.loads(data)
+        print(data)
+        print(data['os'],data['br'],data['id'],data['new_url'],data['original_url'],data['extend'])
+        det=data['ct']
+        print(det['country'],det['regionName'],det['city'],det['isp'])
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        cursor.execute('INSERT INTO views (id,original_url,new_url,extend,country,state,city,service) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)', (data['id'],data['original_url'],data['new_url'], data['extend'],det['country'],det['regionName'],det['city'],det['isp']))
+        conn.commit()
+        conn.close()
+        return None
 @app.route('/stats')
 def stats():
     conn = mysql.connect()
@@ -109,7 +129,7 @@ def edit(id):
     data=cursor.execute('select date,count(date) noof from views where id= (%s) group by date order by date',(id,))
     data=cursor.fetchall()
     #data=json.dumps(data, indent=4, sort_keys=True, default=str)#json.loads(data)
-    print('*******************************',data)
+    #print('*******************************',data)
     conn.commit()
     conn.close()
     return render_template('edit.html',data=data,id=id,original_url=original_url,new_url=new_url,click=click)
@@ -121,7 +141,7 @@ def login():
         password = request.form["password"]
         details=[email,password]
         
-        print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++',details)
+        #print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++',details)
         conn = mysql.connect()
         cursor = conn.cursor()
         data=cursor.execute('select * from login where id=(%s) and password=(%s)',(email,password))
@@ -133,7 +153,7 @@ def login():
         if data[0][0]==email and data[0][1]==password:
             return render_template('index.html',details=details)
         else:       
-            print('EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEExcept  ')
+            #print('EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEExcept  ')
             flash(u'invalid Email or password ')
             
     return render_template('login.html')
@@ -145,7 +165,7 @@ def signup():
         email = request.form["email"]
         password = request.form["password"]
         #email="`"+email+"`"
-        print(email,str(email),']]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]')
+        #print(email,str(email),']]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]')
         email=str(email)
         try :
             conn = mysql.connect()
@@ -156,7 +176,7 @@ def signup():
             conn.commit()
             conn.close()
         except pymysql.err.IntegrityError:
-            print('EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEExcept  ')
+            #print('EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEExcept  ')
             flash(u'Email already in use')
         
     return render_template('signup.html')

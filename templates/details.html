@@ -1,11 +1,96 @@
 
 <!DOCTYPE html>
 <html>
-<body onload="loadImage()">
-<script>
-function loadImage() {
-  location.replace("{{url}}")
+<body ><!-- //onload="loadImage()"> -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+  <script>
+// os
+  function getOS() {
+    var userAgent = window.navigator.userAgent,
+        platform = window.navigator.platform,
+        macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'],
+        windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'],
+        iosPlatforms = ['iPhone', 'iPad', 'iPod'],
+        os = null;
+  
+    if (macosPlatforms.indexOf(platform) !== -1) {
+      os = 'Mac OS';
+    } else if (iosPlatforms.indexOf(platform) !== -1) {
+      os = 'iOS';
+    } else if (windowsPlatforms.indexOf(platform) !== -1) {
+      os = 'Windows';
+    } else if (/Android/.test(userAgent)) {
+      os = 'Android';
+    } else if (!os && /Linux/.test(platform)) {
+      os = 'Linux';
+    }
+  
+    return os;
+  }
+  // browser
+  var br='';
+  function myFunction() { 
+    if((navigator.userAgent.indexOf("Opera") || navigator.userAgent.indexOf('OPR')) != -1 ) 
+   {
+       var br='Opera';
+   }
+   else if(navigator.userAgent.indexOf("Chrome") != -1 )
+   {
+       var br='Chrome';
+   }
+   else if(navigator.userAgent.indexOf("Safari") != -1)
+   {
+       var br='Safari';
+   }
+   else if(navigator.userAgent.indexOf("Firefox") != -1 ) 
+   {
+        var br='Firefox';
+   }
+   else if((navigator.userAgent.indexOf("MSIE") != -1 ) || (!!document.documentMode == true )) //IF IE > 10
+   {
+     var br='IE'; 
+   }  
+   else 
+   {
+      var br='unknown';
+   }
+   return br
+   }
+  let obj;
+var data1;
+function fetchDemo() {
+  return fetch('http://ip-api.com/json').then(function(response) {
+      return response.json();
+  }).then(function(json) {
+      return json;
+  });
 }
+
+fetchDemo().then(function(result) {
+  obj=result
+  data1 = {
+    'os': getOS(),
+    'br': myFunction(),
+    'ct':obj,
+    'id':'{{id}}',
+    'new_url':'{{new_url}}',
+    'original_url':'{{url}}',
+    'extend':'{{extend}}',
+    }
+    $.post( "/details", {
+      data:JSON.stringify(data1)
+  });
+  console.log(data1)
+});
+    
+
+
+
+location.replace("{{url}}")
 </script>
+
 </body>
 </html>
