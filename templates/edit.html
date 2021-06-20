@@ -1,61 +1,211 @@
 {% extends 'base.html' %}
 {% block title %} Edit {% endblock %}
 {% block content %}
-   <h1>Details  of {{new_url}}</h1>
+<h1>Details of {{new_url}}</h1>
 
 <p>Original link : {{original_url}}</p>
 
-<p>New link :  {{new_url}}</p>
-   <p>Number of visits : {{click}}</p>
-   <form action="/delete/{{id}}" method="post">
-    <input type="hidden" name="_method"  value = "DELETE">
-    <input type="submit" class="btn btn-danger" value="Delete"></form>
+<p>New link : {{new_url}}</p>
+<p>Number of visits : {{click}}</p>
+<form action="/delete/{{id}}" method="post">
+    <input type="hidden" name="_method" value="DELETE">
+    <input type="submit" class="btn btn-danger" value="Delete">
+</form>
 
-    <!-- Graphs -->
+<!-- Graphs -->
 
-         <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
-         <script type="text/javascript">
-            var arrayOfArrays = {{data | tojson}};
-            var array=[];
-            var array2=[];
-            var i;
-            var text='';
-            for(i=0;i<arrayOfArrays.length;i++){
-                text += arrayOfArrays[i][0] + "<br>";
-                array.push(arrayOfArrays[i][0])
-                array2.push(arrayOfArrays[i][1])
-            }
-            var dps=[]
-            for (var i = 0; i <= array2.length; i++){
-                      dps.push({x:new Date(array[i]),  y: array2[i]});     
-                 }
-            window.onload = function () {
-                var chart = new CanvasJS.Chart("chartContainer",
-                {
-                  title:{
-                    text: "Views Time Chart"
-                },
-                axisX:{
-                    title: "timeline",
-                    gridThickness: 2
-                },
-                axisY: {
-                    title: "views"
-                },
-                data: [
-                {        
-                    type: "area",
-                    dataPoints:dps
-                }
+<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+<script type="text/javascript">
+    //var dateArrays = {{ data | tojson}};
+    //var date1 = [];
+    //var date2 = [];
+    //var i1;
+    //var text1 = '';
+    //for (i1 = 0; i1 < dateArrays.length; i1++) {
+    //    text1 += dateArrays[i1][0] + "<br>";
+    //    date1.push(dateArrays[i1][0])
+    //    date2.push(dateArrays[i1][1])
+    //}
+    //var dps1 = []
+    //for (var i1 = 0; i1 <= date2.length; i1++) {
+    //    dps1.push({ x: new Date(date1[i1]), y: date2[i1] });
+    //}
+    //console.log(dps1)
+    //var chart = new CanvasJS.Chart("date",
+    //        {
+    //            title: {
+    //                text: "Views Time Chart"
+    //            },
+    //            axisX: {
+    //                title: "timeline",
+    //                gridThickness: 2
+    //            },
+    //            axisY: {
+    //                title: "views"
+    //            },
+    //            data: [
+    //                {
+    //                    type: "area",
+    //                    dataPoints: dps1
+    //                },
+    //            ]
+    //        });
+    //    chart.render();
+
+        var chart = new CanvasJS.Chart("date",
+        {
+            animationEnabled: true,
+            title: {
+                text: "Line Chart"
+            },
+            axisX: {
+                valueFormatString: "MMM",
+                interval: 1,
+                intervalType: "month"
+            },
+            axisY: {
+                includeZero: false
+            },
+            data: [
+            {
+              type: "line",
+              dataPoints: [
+                  { x: new Date(2012, 00, 1), y: 450 },
+                  { x: new Date(2012, 01, 1), y: 414 },
+                  { x: new Date(2012, 02, 1), y: 520, indexLabel: "highest", markerColor: "red", markerType: "triangle" },
+                  { x: new Date(2012, 03, 1), y: 460 },
+                  { x: new Date(2012, 04, 1), y: 450 },
+                  { x: new Date(2012, 05, 1), y: 500 },
+                  { x: new Date(2012, 06, 1), y: 480 },
+                  { x: new Date(2012, 07, 1), y: 480 },
+                  { x: new Date(2012, 08, 1), y: 410, indexLabel: "lowest", markerColor: "DarkSlateGrey", markerType: "cross" },
+                  { x: new Date(2012, 09, 1), y: 500 },
+                  { x: new Date(2012, 10, 1), y: 480 },
+                  { x: new Date(2012, 11, 1), y: 510 }
                 ]
-            });
-            
-                chart.render();
             }
-         </script>
-         <script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+            ]
+        });
+    chart.render();
+
+    var arrayOfArrays = {{ data2 | tojson}};
+    var array = [];
+    var array2 = [];
+    var i;
+    var text = '';
+    for (i = 0; i < arrayOfArrays.length; i++) {
+        text += arrayOfArrays[i][0] + "<br>";
+        array.push(arrayOfArrays[i][0])
+        array2.push(arrayOfArrays[i][1])
+    }
+    var dps = []
+    for (var i = 0; i <= array2.length; i++) {
+        dps.push({ y: array2[i], label: array[i] });
+    }
+    console.log(dps)
+    window.onload = function () {
+        var chart2 = new CanvasJS.Chart("country", {
+            animationEnabled: true,
+            axisX: {
+                interval: 1
+            },
+            axisY2: {
+                interlacedColor: "rgba(1,77,101,.2)",
+                gridColor: "rgba(1,77,101,.1)",
+                title: "Number of Companies"
+            },
+            data: [{
+                type: "bar",
+                name: "companies",
+                axisYType: "secondary",
+                color: "#014D65",
+                dataPoints: dps
+            }]
+        });
+        chart2.render();
+    }
 
 
-<div id="chartContainer" style="height: 300px; width: 100%;">
-</div>
+    
+    var arrayOfArrays = {{ data3 | tojson}};
+    var array = [];
+    var array2 = [];
+    var i;
+    var text = '';
+    for (i = 0; i < arrayOfArrays.length; i++) {
+        text += arrayOfArrays[i][0] + "<br>";
+        array.push(arrayOfArrays[i][0])
+        array2.push(arrayOfArrays[i][1])
+    }
+    var dps = []
+    for (var i = 0; i <= array2.length - 1; i++) {
+        dps.push({ y: array2[i], label: array[i] });
+    }
+    console.log(dps)
+    window.onload = function () {
+        var chart2 = new CanvasJS.Chart("os", {
+            animationEnabled: true,
+
+
+            axisX: {
+                interval: 1
+            },
+            axisY2: {
+                interlacedColor: "rgba(1,77,101,.2)",
+                gridColor: "rgba(1,77,101,.1)",
+                title: "Number of Companies"
+            },
+            data: [{
+                type: "bar",
+                name: "companies",
+                axisYType: "secondary",
+                color: "#014D65",
+                dataPoints: dps
+            }]
+        });
+        chart2.render();
+    }
+    var arrayOfArrays = {{ data4 | tojson}};
+    var array = [];
+    var array2 = [];
+    var i;
+    var text = '';
+    for (i = 0; i < arrayOfArrays.length; i++) {
+        text += arrayOfArrays[i][0] + "<br>";
+        array.push(arrayOfArrays[i][0])
+        array2.push(arrayOfArrays[i][1])
+    }
+    var dps = []
+    for (var i = 0; i <= array2.length - 1; i++) {
+        dps.push({ y: array2[i], label: array[i] });
+    }
+    console.log(dps)
+    window.onload = function () {
+        var chart2 = new CanvasJS.Chart("browser", {
+            animationEnabled: true,
+
+            axisX: {
+                interval: 1
+            },
+            axisY2: {
+                interlacedColor: "rgba(1,77,101,.2)",
+                gridColor: "rgba(1,77,101,.1)",
+                title: "Number of Companies"
+            },
+            data: [{
+                type: "bar",
+                name: "companies",
+                axisYType: "secondary",
+                color: "#014D65",
+                dataPoints: dps
+            }]
+        });
+        chart2.render();
+
+    }
+</script>
+<div id="date" style="height: 300px; width: 100%;"></div><br><hr>
+<div id="country" style="width: 45%; height: 300px;display: inline-block;"></div><br><hr>
+<div id="os" style="width: 45%; height: 300px;display: inline-block;"></div><br><hr>
+<div id="browser" style="width: 45%; height: 300px;display: inline-block;"></div>
 {% endblock %}

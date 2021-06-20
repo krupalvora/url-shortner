@@ -77,7 +77,7 @@ def url_redirect(id):
     else:
         flash('Invalid URL')
         return redirect(url_for('index'))
-@app.route('/details',methods = ['POST', 'GET'])
+@app.route('/details/',methods = ['POST', 'GET'])
 def details():
         print('2222222222222222222222222222222222222222222222')
         data=request.form['data']
@@ -89,7 +89,7 @@ def details():
         print(det['country'],det['regionName'],det['city'],det['isp'])
         conn = mysql.connect()
         cursor = conn.cursor()
-        cursor.execute('INSERT INTO views (id,original_url,new_url,extend,country,state,city,service) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)', (data['id'],data['original_url'],data['new_url'], data['extend'],det['country'],det['regionName'],det['city'],det['isp']))
+        cursor.execute('INSERT INTO views (id,original_url,extend,new_url,country,state,city,service,os,browser) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)', (data['id'],data['original_url'],data['extend'],data['new_url'],det['country'],det['regionName'],det['city'],det['isp'],data['os'],data['br']))
         conn.commit()
         conn.close()
         return None
@@ -128,11 +128,15 @@ def edit(id):
     print(data[0],data[2],data[3],data[4],data[5])
     data=cursor.execute('select date,count(date) noof from views where id= (%s) group by date order by date',(id,))
     data=cursor.fetchall()
-    #data=json.dumps(data, indent=4, sort_keys=True, default=str)#json.loads(data)
-    #print('*******************************',data)
+    data2=cursor.execute('select country,count(country) noof from views where id= (%s) group by country order by country',(id,))
+    data2=cursor.fetchall()
+    data3=cursor.execute('select os,count(os) noof from views where id= (%s) group by country order by os',(id,))
+    data3=cursor.fetchall()
+    data4=cursor.execute('select browser,count(browser) noof from views where id= (%s) group by country order by browser',(id,))
+    data4=cursor.fetchall()
     conn.commit()
     conn.close()
-    return render_template('edit.html',data=data,id=id,original_url=original_url,new_url=new_url,click=click)
+    return render_template('edit.html',data4=data4,data3=data3,data2=data2,data=data,id=id,original_url=original_url,new_url=new_url,click=click)
 @app.route('/login', methods=["GET","POST"])
 def login():
     if request.method == "POST":
