@@ -2,7 +2,7 @@
 {% block title %} Link Shortner {% endblock %}
 {% block content %}
    
-    <form method="post">
+     <form    method="post">
     <div class="form-group">
         <label for="url">URL</label>
         <input type="text" name="url"
@@ -16,7 +16,24 @@
     <div class="form-group">
         <button type="submit" class="btn btn-primary">Submit</button>
     </div>
-    </form>
+    </form> 
+<!-- 
+    <form action="/" method="POST" class="container br-3">
+        <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="url" name="url" placeholder="Abc">
+            <label for="floatingInput">Url</label>
+          </div>
+          <div class="form-floating">
+            <input type="text" class="form-control" id="custom" name="custom" placeholder="Abc">
+            <label for="floatingPassword">custom</label>
+          </div><br>
+        <div class="mb-3 form-check">
+          <input type="checkbox" class="form-check-input" id="exampleCheck1">
+          <label class="form-check-label" for="exampleCheck1">Check me out</label>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+ -->
 
     {% if short_url %}
     <hr>

@@ -1,7 +1,14 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>{% block title %}  Statistics {% endblock %}</h1>
+    <h1>{% block title %}  Statistics
+        {% if name %}
+            {{ name }}
+            {% else %}
+            General
+        {% endif %}
+        
+    {% endblock %}</h1>
     <table class="table">
         <thead>
             <tr>
