@@ -10,6 +10,17 @@
 
 
 <h1>login</h1>
+{% if name %}
+  <p>Account name: {{name}}</p>
+<form action="/logout" method="post">
+  <input type="hidden" name="_method" value="DELETE">
+  <input type="submit" class="btn btn-danger" value="Logout">
+</form><hr>
+<form action="/del_acc/{{name}}" method="post">
+  <input type="hidden" name="_method" value="DELETE">
+  <input type="submit" class="btn btn-danger" value="Delete Account">
+</form>
+{% else %}
 <form action="/login" method="POST" class="container br-3">
     <div class="form-floating mb-3">
         <input type="text" class="form-control" id="name" name="name" placeholder="Abc">
@@ -33,5 +44,5 @@
         <a href="#">Forgot your password?</a>
     </div>
 </div>
-
+{% endif %}
 {% endblock %}

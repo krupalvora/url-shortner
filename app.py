@@ -12,7 +12,7 @@ from flask_session import Session
 
 app = Flask(__name__)
 
-app.config['SECRET_KEY'] = 'krupal vora'
+app.config['SECRET_KEY'] = 'krupal'
 hashids = Hashids(min_length=4, salt=app.config['SECRET_KEY'])
 
 mysql = MySQL()
@@ -45,7 +45,7 @@ def index():
         if not url:
             flash('The URL is required!')
             return redirect(url_for('index'))
-        url_id = cursor.execute('select id from urls ORDER BY id desc')
+        url_id = cursor.execute('select id from `%s` ORDER BY id desc',name)
         url_id =cursor.fetchall()
         url_id=url_id[0]
         url_id=url_id[0]
@@ -56,6 +56,7 @@ def index():
             short_url = request.host_url + custom
             hashid=custom
         url_data = cursor.execute('INSERT INTO `%s` (original_url,new_url,extend) VALUES (%s,%s,%s)', (name,url, short_url, hashid))
+        url_data = cursor.execute('INSERT INTO urls (original_url,new_url,extend) VALUES (%s,%s,%s)', (url, short_url, hashid))
         conn.commit()
         conn.close()
         return render_template('index.html', short_url=short_url)
@@ -67,21 +68,31 @@ def url_redirect(id):
     conn = mysql.connect()
     cursor = conn.cursor()
     original_id=id
-    if original_id!='favicon.ico':
+    if original_id=='favicon.ico':
         return flash(u'Invalid Url')
     print('**************automate exe***************************',original_id,'hmmmmmmmm')
     if original_id and original_id!='favicon.ico':
-        data = cursor.execute('SELECT * FROM urls WHERE extend = (%s)', (original_id,))
-        data = cursor.fetchone()
-        id,original_url,click,new_url,extend=data[0],data[2],data[3],data[4],data[5]
+        if  session.get("name"):
+            name=session.get("name")
+            data = cursor.execute('SELECT * FROM `%s` WHERE extend = (%s)', (name,original_id,))
+            data = cursor.fetchone()    
+            id,original_url,click,new_url,extend=data[0],data[2],data[3],data[4],data[5]
+            cursor.execute('UPDATE `%s` SET click = (%s) WHERE extend = (%s)',(name,click+1,original_id))
+
+        else:
+            data = cursor.execute('SELECT * FROM urls WHERE extend = (%s)', (original_id,))
+            data = cursor.fetchone()
+            id,original_url,click,new_url,extend=data[0],data[2],data[3],data[4],data[5]
+            cursor.execute('UPDATE urls SET click = (%s) WHERE extend = (%s)',(click+1, original_id))
+        
         print('**aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',id)
-        cursor.execute('UPDATE urls SET click = (%s) WHERE extend = (%s)',(click+1, original_id))
         conn.commit()
         conn.close()
         print('--------------if executed--------------------------')
         return render_template('details.html', url=original_url,id=id,new_url=new_url,extend=extend)
     else:
         flash('Invalid URL')
+        return redirect(url_for('index'))
         
 @app.route('/details/',methods = ['POST', 'GET'])
 def details():
@@ -93,11 +104,16 @@ def details():
         print(data['os'],data['br'],data['id'],data['new_url'],data['original_url'],data['extend'])
         det=data['ct']
         print(det['country'],det['regionName'],det['city'],det['isp'])
-        name=session.get("name")
-        views=name+'views'
         conn = mysql.connect()
         cursor = conn.cursor()
-        cursor.execute('INSERT INTO `%s` (id,original_url,extend,new_url,country,state,city,service,os,browser) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)', (views,data['id'],data['original_url'],data['extend'],data['new_url'],det['country'],det['regionName'],det['city'],det['isp'],data['os'],data['br']))
+        if  session.get("name"):
+            name=session.get("name")
+            views=name+'views'
+            print(views)
+            cursor.execute('INSERT INTO `%s` (id,original_url,extend,new_url,country,state,city,service,os,browser) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)', (views,data['id'],data['original_url'],data['extend'],data['new_url'],det['country'],det['regionName'],det['city'],det['isp'],data['os'],data['br']))
+            print('iiiiiiiiiiiiiiiiiiiiiiiiiinnnnnnnnnnnnnnnnnnnnnnnnnssssssssssssssssssseeeeeeeeeeeeeeeeeeerrrrrrrrrtttttttt')
+        else:
+            cursor.execute('INSERT INTO views (id,original_url,extend,new_url,country,state,city,service,os,browser) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)', (data['id'],data['original_url'],data['extend'],data['new_url'],det['country'],det['regionName'],det['city'],det['isp'],data['os'],data['br']))
         conn.commit()
         conn.close()
         return None
@@ -111,6 +127,7 @@ def stats():
         db_urls=cursor.fetchall()
         conn.close()
         urls = list(db_urls)
+        urls=urls[1:]
         return render_template('stats.html', urls=urls,name=name)
     else:
         db_urls = cursor.execute('SELECT * FROM urls')
@@ -131,10 +148,11 @@ def about():
 @app.route('/delete/<string:id>',methods = ['POST', 'GET'])
 def delete(id):
     if  session.get("name"):
+        name=session.get("name")
         id=int(id)
         conn = mysql.connect()
         cursor = conn.cursor()
-        cursor.execute('delete from urls  where id= (%s)', (id,))    
+        cursor.execute('delete from `%s`  where id= (%s)', (name,id,))
         conn.commit()
         conn.close()
         return redirect(url_for('stats'))
@@ -158,12 +176,14 @@ def edit(id):
         data=cursor.fetchall()
         data2=cursor.execute('select country,count(country) noof from `%s` where id= %s group by country order by country',(views,id,))
         data2=cursor.fetchall()
-        data3=cursor.execute('select os,count(os) noof from `%s` where id= %s group by country order by os',(views,id,))
+        data3=cursor.execute('select os,count(os) noof from `%s` where id= %s group by os order by os',(views,id,))
         data3=cursor.fetchall()
-        data4=cursor.execute('select browser,count(browser) noof from `%s` where id= %s group by country order by browser',(views,id,))
+        data4=cursor.execute('select browser,count(browser) noof from `%s` where id= %s group by browser order by browser',(views,id,))
         data4=cursor.fetchall()
         conn.commit()
         conn.close()
+        return render_template('edit.html',data4=data4,data3=data3,data2=data2,data=data,id=id,original_url=original_url,new_url=new_url,click=click)
+
     else:
         data=cursor.execute('select * from urls  where id= (%s)', (id,))  
         data=cursor.fetchone()
@@ -173,16 +193,19 @@ def edit(id):
         data=cursor.fetchall()
         data2=cursor.execute('select country,count(country) noof from views where id= (%s) group by country order by country',(id,))
         data2=cursor.fetchall()
-        data3=cursor.execute('select os,count(os) noof from views where id= (%s) group by country order by os',(id,))
+        data3=cursor.execute('select os,count(os) noof from views where id= (%s) group by os order by os',(id,))
         data3=cursor.fetchall()
-        data4=cursor.execute('select browser,count(browser) noof from views where id= (%s) group by country order by browser',(id,))
+        data4=cursor.execute('select browser,count(browser) noof from views where id= (%s) group by browser order by browser',(id,))
         data4=cursor.fetchall()
         conn.commit()
         conn.close()
         return render_template('edit.html',data4=data4,data3=data3,data2=data2,data=data,id=id,original_url=original_url,new_url=new_url,click=click)
 @app.route('/login', methods=["GET","POST"])
 def login():
-    if request.method == "POST":
+    if  session.get("name"):
+        name=session.get("name")
+        return render_template('login.html',name=name)
+    elif request.method == "POST":
         req = request.form
         name = request.form["name"]
         password = request.form["password"]
@@ -209,14 +232,14 @@ def signup():
         name = request.form["name"]
         password = request.form["password"]
         views=name+'views'
-        print(views,str(email),']]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]')
         try :
             conn = mysql.connect()
             cursor = conn.cursor()
             cursor.execute('insert into user(name,email,password) values (%s,%s,%s)',(name,email,password)) 
             cursor.execute('insert into login(name,password) values (%s,%s)',(name,password))
             cursor.execute(" CREATE TABLE `%s` (id int(11) NOT NULL AUTO_INCREMENT,created date NOT NULL DEFAULT current_timestamp(),original_url text  NOT NULL,click int(11) NOT NULL DEFAULT 0,new_url text DEFAULT NULL,extend text  DEFAULT NULL,PRIMARY KEY (id))",name)
-            cursor.execute('CREATE TABLE `%s` ( `id` int(11) DEFAULT NULL,   `date` date NOT NULL DEFAULT current_timestamp(),   `original_url` text COLLATE utf8mb4_unicode_ci NOT NULL,   `extend` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,   `new_url` text COLLATE utf8mb4_unicode_ci DEFAULT NULL )',views)
+            cursor.execute('CREATE TABLE `%s` ( `id` int(11) DEFAULT NULL,`date` date NOT NULL DEFAULT current_timestamp(),   `original_url` text COLLATE utf8mb4_unicode_ci NOT NULL,   `extend` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,   `new_url` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,`country` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,`state` text COLLATE utf8mb4_unicode_ci DEFAULT NULL ,`city` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,`service` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,`os` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,`browser` text COLLATE utf8mb4_unicode_ci DEFAULT NULL)',views)
+            cursor.execute("insert into `%s`(id,original_url,new_url,extend) values (1,'null','null','null')",name)
             conn.commit()
             conn.close()
             session["name"] = name
@@ -224,10 +247,22 @@ def signup():
         except pymysql.err.IntegrityError:
             flash(u'User name already in use')
     return render_template('signup.html')
-@app.route("/logout")
+@app.route("/logout", methods=["GET","POST"])
 def logout():
     session["name"] = None
     return render_template('login.html')#redirect("index")
+@app.route("/del_acc/<string:name>", methods=["GET","POST"])
+def del_acc(name):
+    name=session.get("name")
+    views=name+'views'
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    cursor.execute("drop table `%s`",name)
+    cursor.execute("drop table `%s`",views)
+    conn.commit()
+    conn.close()
+    session["name"] = None
+    return render_template('signup.html')
 #pymysql.err.IntegrityError: (1062, "Duplicate entry 'krupal.vora@sakec.ac.in' for key 'PRIMARY'")
 if __name__ == '__main__':
     app.run(host='localhost',port=5000  ,debug=True)

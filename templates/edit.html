@@ -30,7 +30,7 @@
     }
     var dps1 = []
     for (var i1 = 0; i1 < date2.length; i1++) {
-        dps1.push({ x: new Date(date1[i1]), y: date2[i1]+1 });
+        dps1.push({ x: new Date(date1[i1]), y: date2[i1] });
     }
     console.log(dps1)
     var chart = new CanvasJS.Chart("date",
@@ -167,7 +167,7 @@ chart.render();
 chart.render(); 
 
 </script> 
-
+{{data3}}
 
 <!--  <script>
     var chart = new CanvasJS.Chart("date",
