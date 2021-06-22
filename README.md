@@ -1,4 +1,4 @@
-# Url-Shortner
+# Url-Shortner (under development)
 
 This is  custom url  shortner used for link shrinking with hash code and custom variable 
 .
