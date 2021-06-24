@@ -14,7 +14,6 @@ app = Flask(__name__)
 
 app.config['SECRET_KEY'] = 'krupal'
 hashids = Hashids(min_length=4, salt=app.config['SECRET_KEY'])
-
 mysql = MySQL()
 app.config['MYSQL_DATABASE_USER'] = 'krupal'
 app.config['MYSQL_DATABASE_PASSWORD'] = '1234'
@@ -36,8 +35,10 @@ def index():
         custom=data['custom']
         data = cursor.execute('SELECT extend FROM urls WHERE extend = (%s)', (custom,))
         data = cursor.fetchone()
+        data2 = cursor.execute('SELECT extend FROM purls WHERE extend = (%s)', (custom,))
+        data2 = cursor.fetchone()
         try:
-            if data[0]!='':
+            if data[0]!='' and data2!='':
                 flash('set other custom url !')
                 return redirect(url_for('index'))
         except:
@@ -56,7 +57,7 @@ def index():
             short_url = request.host_url + custom
             hashid=custom
         url_data = cursor.execute('INSERT INTO `%s` (original_url,new_url,extend) VALUES (%s,%s,%s)', (name,url, short_url, hashid))
-        url_data = cursor.execute('INSERT INTO urls (original_url,new_url,extend) VALUES (%s,%s,%s)', (url, short_url, hashid))
+        url_data = cursor.execute('INSERT INTO purls (original_url,new_url,extend,name) VALUES (%s,%s,%s,%s)', (url, short_url, hashid,name))
         conn.commit()
         conn.close()
         return render_template('index.html', short_url=short_url)
@@ -221,8 +222,7 @@ def login():
                 session["name"] = name
                 return render_template('index.html',details=details)
         except:       
-            flash(u'invalid Email or password ')
-            
+            flash(u'invalid Email or password ')      
     return render_template('login.html')
 @app.route('/signup', methods=["GET","POST"])
 def signup():
@@ -243,9 +243,11 @@ def signup():
             conn.commit()
             conn.close()
             session["name"] = name
-            return render_template('index.html')#return redirect(url_for('index'))
+            return redirect(url_for('index'))
         except pymysql.err.IntegrityError:
             flash(u'User name already in use')
+        except :
+            return render_template('signup.html')        
     return render_template('signup.html')
 @app.route("/logout", methods=["GET","POST"])
 def logout():
@@ -259,10 +261,26 @@ def del_acc(name):
     cursor = conn.cursor()
     cursor.execute("drop table `%s`",name)
     cursor.execute("drop table `%s`",views)
+    cursor.execute("delete from login where name=%s",name)
+    cursor.execute("delete from user where name=%s",name)
+    cursor.execute("delete from purls where name=%s ",name)
     conn.commit()
     conn.close()
     session["name"] = None
     return render_template('signup.html')
-#pymysql.err.IntegrityError: (1062, "Duplicate entry 'krupal.vora@sakec.ac.in' for key 'PRIMARY'")
+""" @app.route("/pswd", methods=["GET","POST"])
+def pswd():
+    clicked=None
+    if request.method == "POST":
+          clicked=request.json['data']
+          print(clicked)
+    print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
+    if request.method=="POST":
+        print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
+        data=request.json['data']
+        data=json.loads(data)
+        print(data,'++++++++++++++++++++++++++++++++++++++++++++++++++++++')
+    return data """
+
 if __name__ == '__main__':
     app.run(host='localhost',port=5000  ,debug=True)

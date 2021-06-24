@@ -7,7 +7,9 @@
         {{messages[0]}}
     </div>
 {% endif %}
-
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
 
 <h1>login</h1>
 {% if name %}
@@ -41,8 +43,26 @@
         Don't have an account ? &ensp; <a href="/signup">Sign Up</a>
     </div>
     <div class="d-flex justify-content-center">
-        <a href="#">Forgot your password?</a>
+        <a   onclick="passwd()"  >Forgot your password?</a>
     </div>
 </div>
+<p id="demo"></p>
+<script>
+
+function passwd(){
+  {
+        var data1='krupal'
+        $.ajax({
+        type : 'POST',
+        url : '/pswd',
+        contentType: 'application/json;charset=UTF-8',
+        data : {'data':data1}
+      });
+    }
+  }
+
+
+</script>
+
 {% endif %}
 {% endblock %}

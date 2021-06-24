@@ -1,0 +1,19 @@
+Metadata-Version: 2.1
+Name: kv-mail
+Version: 0.0.2
+Summary: simplified code of sending mail
+Home-page: UNKNOWN
+Author: krupal vora
+Author-email: krupal.vora@sakec.ac.in
+License: UNKNOWN
+Keywords: kv_mail
+Platform: UNKNOWN
+Classifier: Intended Audience :: Education
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.7
+Description-Content-Type: text/markdown
+
+Using this module you can use mail services very quickly
+
+
