@@ -7,7 +7,7 @@ It also provides statical view i.e. no of times links visited.
 
 Example:
 
-   https://github.com/krupalvora/url-shortner converted into https://lsht.herokuapp.com/BnVB
+   https://github.com/krupalvora/url-shortner converted into https://kvurl.herokuapp.com/git
 
 ## Authors
 
@@ -29,11 +29,11 @@ Copyright (c) 2021 Krupal vora : [License.md](https://github.com/krupalvora/url-
 Herokuapp 
 Aws RDS 
 
-[Click here to visit app](https://lsht.herokuapp.com/)
+[Click here to visit app](https://kvurl.herokuapp.com/)
 
 or
 
-[https://lsht.herokuapp.com/](https://lsht.herokuapp.com/)
+[https://kvurl.herokuapp.com/](https://kvurl.herokuapp.com/)
 
   
 ## Technologies
