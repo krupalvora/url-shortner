@@ -7,7 +7,7 @@ It also provides statical view i.e. no of times links visited.
 
 Example:
 
-   https://github.com/krupalvora/url-shortner converted into https://kvurl.herokuapp.com/git
+   https://www.dadabhagwan.org/books-media/spiritual-articles/know-thy-self-and-experience-it/ converted into https://kvurl.herokuapp.com/DADA
 
 ## Authors
 
